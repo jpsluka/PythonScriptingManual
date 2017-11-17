@@ -24,8 +24,9 @@ CC3D:
                 _grid=True # only in 3.7.6 or higher
             )
 
-            self.pW.addPlot('AverageVol', _style='Dots', _color='red', _size=5)
-            self.pW.addPlot('Cell1Vol', _style='Steps', _color='black', _size=5)
+            self.pW.addPlot('AverageVol',_style='Dots',_color='red',_size=5)
+            self.pW.addPlot('Cell1Vol',_style='Steps',_color='black',_size=5)
+            self.pW.addPlot('Cell1Surf',_style='Lines' _color='green',_size=2)
 
         def step(self, mcs):
 
@@ -43,25 +44,28 @@ CC3D:
 
             self.pW.addDataPoint("AverageVol", mcs, averVol)  # name of the data series, x, y
             self.pW.addDataPoint("Cell1Vol", mcs, cell1.volume)  # name of the data series, x, y
+            self.pW.addDataPoint("Cell1Surf", mcs, cell1.surface)  # name of the data series, x, y
             # self.pW.showAllPlots() # no longer necessary
 
 In the ``start`` function we create plot window (``self.pW``) – the arguments of
 this function are self explanatory. After we have plot windows object
-(``self.pW``) we are adding actual plots to it. Here we will plot two
+(``self.pW``) we are adding actual plots to it. Here we will plot three
 time-series data, one showing average volume of all cells and one
-showing instantaneous volume of cell with id 1:
+showing instantaneous volume and surface of cell with id 1:
 
 .. code-block:: python
 
     self.pW.addPlot('AverageVol',_style='Dots',_color='red',_size=5)
     self.pW.addPlot('Cell1Vol',_style='Steps',_color='black',_size=5)
+    self.pW.addPlot('Cell1Surf',_style='Lines',_color='green',_size=2)
 
-We are specifying here plot symbol types (``Dots``, ``Steps``), their sizes and
+We are specifying here plot symbol types (``Dots``, ``Steps``, ``Lines``), their sizes and
 colors. The first argument is then name of the data series. This name
 has two purposes – **1.** It is used in the legend to identify data points
 and **2.** It is used as an identifier when appending new data. We can also
 specify logarithmic axis by using ``_yScaleType='log'`` as in the example
-above.
+above. The difference between styles ``Steps`` and ``Lines`` is that with the former
+the area under the curve is filled and for the latter it isn't.
 
 In the ``step`` function we are calculating average volume of all cells and
 extract instantaneous volume of cell with id ``1``. After we are done with
@@ -69,13 +73,14 @@ calculations we are adding our results to the time series:
 
 .. code-block:: python
 
-    self.pW.addDataPoint("AverageVol",mcs,averVol) # name of the data series, x, y
-    self.pW.addDataPoint("Cell1Vol",mcs,cell1.volume) # name of the data series, x, y
+    self.pW.addDataPoint("AverageVol", mcs, averVol) # name of the data series, x, y
+    self.pW.addDataPoint("Cell1Vol", mcs, cell1.volume) # name of the data series, x, y
+    self.pW.addDataPoint("Cell1Surf", mcs, cell1.surface)  # name of the data series, x, y
 
-Notice that we are using data series identifiers (``AverageVol`` and
-``Cell1Vol``) to add new data. The second argument in the above function
+Notice that we are using data series identifiers (``AverageVol``, 
+``Cell1Vol`` and ``Cell1Surf``) to add new data. The second argument in the above function
 calls is current Monte Carlo Step (mcs) whereas the third is actual
-quantity that we want to plot on Y axis. We are done at this point
+quantity that we want to plot on Y axis.
 
 **Important:** Previous versions of CC3D required users to explicitly
 update plots by calling self.pW.showAllPlots() . ***This is no longer
