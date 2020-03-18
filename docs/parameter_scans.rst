@@ -3,30 +3,31 @@ Parameter Scans
 
 .. note::
 
-   Specification of parameter scans in version 4.x.x is different than in earlier versions. In particular old parameter scan simulations will not run in 4.x but as you will see the new way of specifying paramter scans is much simpler and less laborious than in previous implementations.
+   The specification of parameter scans in version 4.x.x is different than in earlier versions. As a result, 
+   old parameter scan simulations will not run in 4.x.x. However, the new way of specifying paramter scans 
+   is much simpler and less laborious than in previous implementations.
 
 When building biomedical simulations it is a common practice to explore
 parameter space to search for optimal solution or to study the
-robustness of parameter set at hand. In the past researchers have used
+robustness of parameter sets. In the past, researchers have used
 (or abused) Python to run multiple replicas of the same simulation with
-different parameter set for each run. Because this approach usually
-involved writing some kind of Python wrapper on top of existing CC3D
-code, more often than not it led to hard-to-understand codes which were
-difficult to share and were hard to access by non-programmers.
+different parameter sets for each run. Because this approach usually
+involved writing a Python wrapper on top of existing CC3D
+code, more often than not it led to hard-to-understand codes that were
+difficult to share and were hard to access by other users.
 
-Current version of CC3D attempts to solve these issues by offering users
+The current version of CC3D attempts to solve these issues by offering users
 ability to create and run parameter scans directly from CC3D GUI’s or
-from command line. The way in which parameter scan simulation is run is
+from the command line. The way in which a parameter scan simulation is run is
 exactly the same as for “regular”, single-run simulation.
 
-Implementation of parameter scans requires users to write simple JSON
-file with parameter scan specification and replacing
-actual values in the CC3DML or Python scripts with template markers.
+Implementation of parameter scans requires users to write a simple JSON
+file with the parameter scan specification and replacing
+the target  values in the CC3DML or Python scripts with template markers.
 Let us look at the example simulation in ``Demos/ParameterScan/CellSorting``.
-The parameter scan specification file ``ParameterScanSpecs.json`` looks as follows:
+The parameter scan specification file ``ParameterScanSpecs.json`` contains:
 
 .. code-block:: json
-
    {
        "version":"4.0.0",
        "parameter_list":{
@@ -45,31 +46,32 @@ The parameter scan specification file ``ParameterScanSpecs.json`` looks as follo
        }
    }
 
-the syntax is fairly simple and if you look closely it is essentially syntax of nested Python dictionaries
-At the top-level we specify ``version`` and ``parameter_list`` entries. The latter one stores several entries
-each for the parameter we wish to scan.. in our example we will be changing parameter ``y_dim`` - assigning
-values from the following list: ``[65,110,120]``, parameter ``steps`` with values  specified by ``[2,3,4,5,6]``,
-``MYVAR`` , that will take values from list ``[0,1,2]`` and ``MYVAR1`` , taking values from ``["'abc1,abc2'","'abc'"]``. As you can see, the values we assign can be either numbers or strings.
+The syntax is fairly simple and is essentially a nested Python dictionaries syntax.
+At the top-level we specify ``version`` and ``parameter_list`` entries. The parameter_list stores several entries
+for the parameters we wish to scan. In our example we will be changing parameter ``y_dim`` - assigning
+values from the list: ``[65,110,120]``, parameter ``steps`` with values  specified by ``[2,3,4,5,6]``,
+``MYVAR`` , that will take values from list ``[0,1,2]`` and ``MYVAR1`` taking values from ``["'abc1,abc2'","'abc'"]``. 
+As you can see, the values can be either numbers or strings.
 
-Next, we need to indicate which parameters in the CC3DML and Python files are to be replaced with values
+Next, we need to indicate which parameters in the CC3DML and Python files for the CC3D project 
+are to be replaced with values
 specified in ``ParameterScanSpecs.json``. Let's start with analysing CC3DML script:
 
 .. code-block:: xml
 
    <CompuCell3D version="4.0.0">
-
       <Potts>
          <Dimensions x="100" y="{{y_dim}}" z="1"/>
          <Steps>{{steps}}</Steps>
          <Temperature>10.0</Temperature>
          <NeighborOrder>2</NeighborOrder>
       </Potts>
-
    ...
    </CompuCell3D>
 
 Here in the ``Potts`` section we can see two labels that appeared in ``ParameterScanSpecs.json`` - ``{{y_dim}}`` and
-``{{steps}}``.  they are surrounded in double curly braces to allow templating engine to make substitutions i.e. ``{{y_dim}}`` will be replaced with appropriate value from ``[65,110,120]`` list and, similarly, ``{{steps}}``
+``{{steps}}``.  They are surrounded eith double curly braces to allow the templating engine to make substitutions i.e. 
+``{{y_dim}}`` will be replaced with appropriate value from ``[65,110,120]`` list and, similarly, ``{{steps}}``
 will take values from ``[2,3,4,5,6]``.
 
 The remaining two parameters ``MYVAR`` and ``MYVAR1`` will be used to make substitutions in Python steppable script:
@@ -77,7 +79,6 @@ The remaining two parameters ``MYVAR`` and ``MYVAR1`` will be used to make subst
 .. code-block:: python
 
    from cc3d.core.PySteppables import *
-
 
    MYVAR={{MYVAR}}
    MYVAR1={{MYVAR1}}
@@ -97,7 +98,7 @@ The remaining two parameters ``MYVAR`` and ``MYVAR1`` will be used to make subst
                    # Make sure ExternalPotential plugin is loaded
                    cell.lambdaVecX=-0.5 # force component pointing along X axis - towards positive X's
 
-When the parameter scan runs CC3D keeps track of which combinations of parameters to apply at a given moment.
+When the parameter scan runs, CC3D keeps track of which combinations of parameters to apply at a given moment.
 
 Running Parameter Scans
 ------------------------
